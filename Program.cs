@@ -1,4 +1,8 @@
 ﻿// See https://aka.ms/new-console-template for more information
+using System;
+using System.Globalization;
+CultureInfo.CurrentCulture = new CultureInfo("en-US");
+
 
 // the ourAnimals array will store the following: 
 string animalSpecies = "";
@@ -7,14 +11,17 @@ string animalAge = "";
 string animalPhysicalDescription = "";
 string animalPersonalityDescription = "";
 string animalNickname = "";
+string suggestedDonation = "";
 
 // variables that support data entry
 int maxPets = 5;
+int maxAttribute = 7;
 string? readResult;
 string menuSelection = "";
+decimal decimalDonation = 0.00m;
 
 // array used to store runtime data, there is no persisted data
-string[,] ourAnimals = new string[maxPets, 6];
+string[,] ourAnimals = new string[maxPets, maxAttribute];
 
 // create some initial ourAnimals array entries
 for (int i = 0; i < maxPets; i++)
@@ -27,6 +34,7 @@ for (int i = 0; i < maxPets; i++)
         animalPhysicalDescription = "medium sized cream colored female golden retriever weighing about 65 pounds. housebroken.";
         animalPersonalityDescription = "loves to have her belly rubbed and likes to chase her tail. gives lots of kisses.";
         animalNickname = "lola";
+        suggestedDonation = "85.00";
     }
     else if (i == 1)
     {
@@ -36,6 +44,7 @@ for (int i = 0; i < maxPets; i++)
         animalPhysicalDescription = "large reddish-brown male golden retriever weighing about 85 pounds. housebroken.";
         animalPersonalityDescription = "loves to have his ears rubbed when he greets you at the door, or at any time! loves to lean-in and give doggy hugs.";
         animalNickname = "loki";
+        suggestedDonation = "49.99";
     }
     else if (i == 2)
     {
@@ -45,6 +54,7 @@ for (int i = 0; i < maxPets; i++)
         animalPhysicalDescription = "small white female weighing about 8 pounds. litter box trained.";
         animalPersonalityDescription = "friendly";
         animalNickname = "Puss";
+        suggestedDonation = "40.00";
     }
     else if (i == 3)
     {
@@ -54,6 +64,7 @@ for (int i = 0; i < maxPets; i++)
         animalPhysicalDescription = "";
         animalPersonalityDescription = "";
         animalNickname = "";
+        suggestedDonation = "";
     }
     else
     {
@@ -63,6 +74,7 @@ for (int i = 0; i < maxPets; i++)
         animalPhysicalDescription = "";
         animalPersonalityDescription = "";
         animalNickname = "";
+        suggestedDonation = "";
     }
 
     ourAnimals[i, 0] = "ID #: " + animalID;
@@ -71,6 +83,14 @@ for (int i = 0; i < maxPets; i++)
     ourAnimals[i, 3] = "Nickname: " + animalNickname;
     ourAnimals[i, 4] = "Physical description: " + animalPhysicalDescription;
     ourAnimals[i, 5] = "Personality: " + animalPersonalityDescription;
+
+    // Data validation for suggested donation
+    if (!decimal.TryParse(suggestedDonation, out decimalDonation))
+    {
+        decimalDonation = 45.00m;
+    }
+
+    ourAnimals[i, 6] = $"Suggested Donation: {decimalDonation:C2}";
 }
 
 //////////////////////////////////////////////////////
@@ -138,7 +158,7 @@ do
                     if (ourAnimals[i, 0] != "ID #: ")
                     {
                         Console.WriteLine("-----------------");
-                        for (int j = 0; j < 6; j++)
+                        for (int j = 0; j < maxAttribute; j++)
                         {
                             Console.WriteLine(ourAnimals[i, j]);
                         }
@@ -249,6 +269,35 @@ do
                         }
                     } while (animalNickname == "");
 
+                    // Animal suggested donation entry. If the entry is blank, the default donation will be $45.
+                    do
+                    {
+                        Console.WriteLine("Enter suggested donation for the pet. (if left blank, the default suggested donation will be $45.00)");
+                        readResult = Console.ReadLine();
+                        if(readResult != null)
+                        {
+                            suggestedDonation = readResult.Trim();
+                            // Default entry (Left blank)
+                            if(suggestedDonation == "")
+                            {
+                                decimalDonation = 45.00m;
+                                validEntry = true;
+                            }
+                            else 
+                            {
+                                validEntry = decimal.TryParse(suggestedDonation, out decimalDonation);
+                                if (validEntry)
+                                {
+                                    validEntry = true;
+                                } 
+                                else
+                                {
+                                    Console.WriteLine("Please input a number.");
+                                }
+                            }
+                        }
+                    } while (validEntry == false);
+
                     // Store the pet information in the ourAnimals array (zero based)
                     ourAnimals[petCount, 0] = "ID #: " + animalID;
                     ourAnimals[petCount, 1] = "Species: " + animalSpecies;
@@ -256,6 +305,7 @@ do
                     ourAnimals[petCount, 3] = "Nickname: " + animalNickname;
                     ourAnimals[petCount, 4] = "Physical description: " + animalPhysicalDescription;
                     ourAnimals[petCount, 5] = "Personality: " + animalPersonalityDescription;
+                    ourAnimals[petCount, 6] = $"Suggested Donation: {decimalDonation:C2}"; 
                     Console.WriteLine("The pet information has been added to our database");
 
                     // Increment of pet count for adding new animal (y)
@@ -418,11 +468,82 @@ do
                 Console.WriteLine("Press the Enter key to continue.");
                 readResult = Console.ReadLine();
                 break;
+
+            /*************************************************************************************************
+                Option 8 is to display all dogs in the database array that has the same characteristics as user
+                input description. These characteristics is based on physical and personality description from
+                dog information.
+            **************************************************************************************************/
             case "8":
-                Console.WriteLine("this app feature is coming soon - please check back to see progress.");
+                string dogDescription = "";
+                bool dogEntry = false;
+                int matchNumber = 0;
+
+                do
+                {
+                    Console.WriteLine("\nEnter desired dog characteristics to search for separated by commas: ");
+                    readResult = Console.ReadLine();
+                    Console.WriteLine("");
+
+                    if (readResult != null)
+                    {
+                        dogDescription = readResult.ToLower().Trim();
+                        // if inputed dog characteristics is empty
+                        if(dogDescription == "")
+                        {
+                            Console.WriteLine("Please input some description that you want from our dog");
+                        }
+
+                        // if there are dog characteristics that is inputed by user
+                        else
+                        {
+                            string[] dogDescriptionArray = dogDescription.Split(",");
+                            // Trim space between commas for eact item that is inputed
+                            for (int i = 0; i < dogDescriptionArray.Length; i++)
+                            {
+                                dogDescriptionArray[i] = dogDescriptionArray[i].Trim();
+                            }
+
+                            for (int i = 0; i < petCount; i++)
+                            {
+                                bool matchedPets = false;
+                                if (ourAnimals[i, 1].Contains("dog"))
+                                {
+                                    string dogCharacteristics = ourAnimals[i, 4].ToLower() + "\n" + ourAnimals[i, 5].ToLower();
+                                    // if dog characteristics = one of dog description input
+                                    for (int j = 0; j < dogDescriptionArray.Length; j++)
+                                    {
+                                        if (dogCharacteristics.Contains(dogDescriptionArray[j]))
+                                        {
+                                            Console.WriteLine($"Our dog {ourAnimals[i, 3]} matches your search for {dogDescriptionArray[j]}");
+                                            matchNumber++;
+                                            matchedPets = true;
+                                        }
+                                    }
+                                    if (matchedPets)
+                                    {
+                                        Console.WriteLine($"{ourAnimals[i,3]} ({ourAnimals[i,0]})");
+                                        Console.WriteLine($"{ourAnimals[i,4]}");
+                                        Console.WriteLine($"{ourAnimals[i,5]}");
+                                        Console.WriteLine($"------------------");
+                                    }
+                                } 
+                            }
+                            dogEntry = true;
+                        }
+                    }
+
+                } while (dogEntry == false);
+
+                if (matchNumber == 0)
+                {
+                    Console.WriteLine($"No results found for: {dogDescription}.");
+                }
+
                 Console.WriteLine("Press the Enter key to continue.");
                 readResult = Console.ReadLine();
                 break; 
+
             case "":
                 Console.WriteLine("You haven't inputed anything. Please try again");
                 Console.WriteLine("Press the Enter key to continue.");
