@@ -7,7 +7,7 @@ pets information. The key informations of each pets are listed below:<br>
 - Physical Description
 - Personality Description
 - Nickname
-
+- Suggested Donation
 
 ## About
 These program is a learning project build by author with the guidance of 
@@ -20,3 +20,7 @@ to database.
 
 ### V.1.0.1
 Adding feature of updating pets information when it is empty (for Age, Nickname, Physical, and Personality description).
+
+### V.1.0.2
+- Adding feature of displaying all dogs with specified characteristics inputed by user.
+- Adding Suggested Donation field in pets information.
